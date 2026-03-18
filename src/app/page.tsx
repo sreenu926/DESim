@@ -9,7 +9,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="bg-blue-900 border-b border-blue-700 px-8 py-6">
         <h1 className="text-3xl font-bold">DESim</h1>
-        <p className="text-blue-300 mt-1">Digital Electronics Lab Simulator — IIT Roorkee</p>
+        <p className="text-blue-300 mt-1">Digital Electronics Lab Simulator — HSST-SRHU</p>
       </div>
 
       {/* Experiments Grid */}
