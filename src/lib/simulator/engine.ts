@@ -1,5 +1,13 @@
 // src/lib/simulator/engine.ts
 import { SimulatorState, PlacedIC, WireTerminal } from '@/types';
+import { ICDefinition } from "@/types";
+import { IC_7483 } from "@/lib/experiments/exp04-full-adder/ics";
+import { IC_7408, IC_7432, IC_7404, IC_7400, IC_7402, IC_7486, IC_7466 } from "@/lib/experiments/exp01-logic-gates/ics";
+
+const IC_DEFS: Record<string, ICDefinition> = {
+  "7483": IC_7483, "7408": IC_7408, "7432": IC_7432, "7404": IC_7404,
+  "7400": IC_7400, "7402": IC_7402, "7486": IC_7486, "7466": IC_7466,
+};
 import { simulate7483 } from '@/lib/experiments/exp04-full-adder/logic';
 import { simulate7408, simulate7432, simulate7404, simulate7400, simulate7402, simulate7486, simulate7466 } from '@/lib/experiments/exp01-logic-gates/logic';
 
@@ -32,7 +40,6 @@ function isOutputPin(ic: PlacedIC, pinId: string): boolean {
 
 // ── Node key helpers ──────────────────────────────────────────────────────────
 function getNodeKey(t: WireTerminal): string {
-  if (t.instanceId.startsWith('hole-')) {
     const parts = t.instanceId.split('-');
     // row+col = unique point
     // Rows a-e are top half, f-j are bottom half
@@ -48,7 +55,7 @@ function parseNodeKey(key: string): WireTerminal {
 }
 
 // ── Build adjacency graph ─────────────────────────────────────────────────────
-function buildGraph(wires: SimulatorState['wires']): Map<string, Set<string>> {
+function buildGraph(wires: SimulatorState["wires"], placedICs: PlacedIC[]): Map<string, Set<string>> {
   const graph = new Map<string, Set<string>>();
   const addEdge = (a: string, b: string) => {
     if (!graph.has(a)) graph.set(a, new Set());
@@ -58,6 +65,18 @@ function buildGraph(wires: SimulatorState['wires']): Map<string, Set<string>> {
   };
   for (const wire of wires) {
     addEdge(getNodeKey(wire.from), getNodeKey(wire.to));
+  }
+  // Inject IC pin <-> breadboard hole connections
+  for (const ic of placedICs) {
+    const def = IC_DEFS[ic.icId];
+    if (!def) continue;
+    for (const pin of def.pins) {
+      const col = ic.col + pin.index;
+      const row = pin.side === "top" ? "e" : "f";
+      const icKey = "ic:" + ic.instanceId + ":" + pin.id;
+      const holeKey = "hole:hole-" + row + "-" + col;
+      addEdge(icKey, holeKey);
+    }
   }
   return graph;
 }
@@ -125,7 +144,7 @@ export function runSimulation(state: SimulatorState): SimulatorState {
     ...ic,
     pinValues: { ...ic.pinValues, VCC: 1 as 0|1, GND: 0 as 0|1 },
   }));
-  const graph = buildGraph(wires);
+  const graph = buildGraph(wires, placedICs);
 
   const nets  = findNets(graph);
 
