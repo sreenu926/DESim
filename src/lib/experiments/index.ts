@@ -2,6 +2,7 @@
 
 import { ExperimentConfig } from "@/types";
 import { exp04Config } from "./exp04-full-adder";
+import { exp01Config } from "./exp01-logic-gates";
 
 // ─── Experiment Registry ──────────────────────────────────────────────────────
 // To add a new experiment:
@@ -12,6 +13,7 @@ import { exp04Config } from "./exp04-full-adder";
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const EXPERIMENTS: ExperimentConfig[] = [
+  exp01Config,
   exp04Config,
   // exp01Config,  ← future experiments get added here
   // exp02Config,

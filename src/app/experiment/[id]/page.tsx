@@ -6,6 +6,7 @@ import { SimulatorState, WireTerminal, Wire, PlacedIC } from "@/types";
 import { getExperiment } from "@/lib/experiments";
 import { runSimulation } from "@/lib/simulator";
 import { IC_7483 } from "@/lib/experiments/exp04-full-adder";
+import { IC_7408, IC_7432, IC_7404, IC_7400, IC_7402, IC_7486, IC_7466 } from "@/lib/experiments/exp01-logic-gates";
 
 import dynamic from 'next/dynamic';
 
@@ -13,7 +14,16 @@ const BreadboardCanvas = dynamic(
   () => import('@/components/simulator/BreadboardCanvas'),
   { ssr: false, loading: () => <div className='flex-1 bg-amber-900' /> }
 );
-const IC_DEFINITIONS = { "7483": IC_7483 };
+const IC_DEFINITIONS: Record<string, import('@/types').ICDefinition> = {
+  '7483': IC_7483,
+  '7408': IC_7408,
+  '7432': IC_7432,
+  '7404': IC_7404,
+  '7400': IC_7400,
+  '7402': IC_7402,
+  '7486': IC_7486,
+  '7466': IC_7466,
+};
 
 const HEADER_H = 56;
 const TOOLBAR_H = 48;
